@@ -34,6 +34,7 @@ def death_restart():
     global k
     global x
     global y
+    global time_inic
     print('Death restart, i: '+str(i)+' len: '+str(length))
     try:
         x, y = py.locateCenterOnScreen("resources/"+steps[i]+".PNG" , confidence=0.9)
@@ -41,13 +42,16 @@ def death_restart():
             print('Death restart, i: '+str(i)+' len: '+str(length))
             try:
                 x, y = py.locateCenterOnScreen("resources/"+steps[i]+".PNG" , confidence=0.9)
+                #mods
+                if steps[i] == "heal1":
+                    time.sleep(5)
                 i += 1
                 time.sleep(.5)
-                if i == 3:
-                    time.sleep(10)
-                py.click(x, y)
+                py.click(x, y) #click
+                #exit
                 if i == length-1:
-                    k = 6
+                    k = 5
+                    time_inic = time.time()
             except:
                 continue
     except:
@@ -66,16 +70,17 @@ def show_time():
 '''
 El script sigue el orden de la lista como pasos
 '''
-steps = ['granblue_bookmark', 'summon_hades', 'button_ok', 
-         'personaje_fediel', 'habilidad_fediel', 'button_attack', 
-         'button_full', 'button_attackCancel', 'button_ok2']
+steps = ['granblue_bookmark', 'summon_hades',
+         'button_ok','personaje_fediel', 'habilidad_fediel', 
+         'button_attack', 'button_full', 'button_attackCancel', 
+         'button_ok2']
 steps_refill = ['potion', 'button_ok_refill']
 
 k = 0 #step counter
 j = 0 #step refill counter
 loop = 0 #loop
 running_start = time.time() #start of script
-time_inic = time.time() #counter
+time_inic = time.time() #time counter
 reload = "f5" #reload button
 reload_count = 0 #reload counter
 x, y = -1, -1 #position variables
@@ -96,23 +101,25 @@ while True:
             #tryes to refill potion
             try:
                 x, y = py.locateCenterOnScreen("resources/"+steps_refill[j]+".PNG" , confidence=0.9)
-                while True:
+                while j < length_refill:
                     try:
+                        show_time()
+                        print("j: ", str(j))
                         x, y = py.locateCenterOnScreen("resources/"+steps_refill[j]+".PNG" , confidence=0.9)
                         #Modificadores segun los pasos
                         if j == 0:
-                            y += 150
+                            py.click(x, y+140)
+                        else:
                         #clicks    
-                        py.click(x, y+150)
+                            py.click(x, y)
                         j += 1
-                        #condicional de salida
-                        if length_refill == j:
-                            j == 0
-                            time_inic = time.time()
-                            break
                     except:
                         continue
+                    #condicional de salida
+                j = 0
+                time_inic = time.time()
             except:
+                print("Potion.PNG not found.")
                 pass
         if k == 8:
             show_time()
@@ -128,13 +135,14 @@ while True:
         #Reload timer and reload count
         time_inic = time.time()
         reload_count = 0
+        #Modificators base on step
         #Reload loop
         if k == (length-1):
             k = 0
             continue
         #delay before attack
         if k == 3:
-            time.sleep(0)
+            time.sleep(5)
         #Click
         py.click(x, y)
         #Press f5 to avoid stuck on f6
